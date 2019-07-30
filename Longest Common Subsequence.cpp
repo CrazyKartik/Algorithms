@@ -1,66 +1,65 @@
 #include<iostream>
+#include<cstring>
 using namespace std;
 
-string longer(string s1,string s2)
+int max(int a, int b)
 {
-	return (s1.length()>s2.length())?s1:s2;
-}
-
-string LCS(string s1,string s2,int ss1,int es1,int ss2,int es2,string *mem,int col)
-{
-	if(ss1>=es1 || ss2>=es2)
-	return "";
-	
-	if(*((mem+ss1*col)+ss2)!="")
-		return *((mem+ss1*col)+ss2);
-	
-	int k=es2;
-	for(int i=ss2; i<es2; i++)
-	{
-		if(s2[i]==s1[ss1])
-		{
-			k=i;
-			break;
-		}
-	}
-	
-	if(k>=es2)
-	{
-		if(*((mem+(ss1+1)*col)+ss2)=="")
-			*((mem+(ss1+1)*col)+ss2)=LCS(s1,s2,ss1+1,es1,ss2,es2,mem,col);
-		return *((mem+(ss1+1)*col)+ss2);
-	}
-	
-	if(*((mem+(ss1+1)*col)+k+1)=="")
-			*((mem+(ss1+1)*col)+k+1)=LCS(s1,s2,ss1+1,es1,k+1,es2,mem,col);
-	string r1=s1[ss1]+*((mem+(ss1+1)*col)+k+1);
-	
-	if(*((mem+(ss1+1)*col)+ss2)=="")
-			*((mem+(ss1+1)*col)+ss2)=LCS(s1,s2,ss1+1,es1,ss2,es2,mem,col);
-	string r2=*((mem+(ss1+1)*col)+ss2);
-	
-	return longer(r1,r2);
+	return (a > b)?a:b;
 }
 
 int main()
 {
-	string s1,s2;
-	cout<<"Enter First String : ";
-	cin>>s1;
-	cout<<"Enter Second String : ";
-	cin>>s2;
+	int l1,l2;
 	
-	int l1=s1.length();
-	int l2=s2.length();
+	cin>>l1>>l2;
+	int seqA[l1], seqB[l2];
 	
-	string mem[l1+1][l2+1];
-	for(int i=0; i<l1+1; i++)
+	for(int i = 0; i < l1; i++)
+	cin>>seqA[i];
+	
+	for(int i = 0; i < l2; i++)
+	cin>>seqB[i];
+	
+	if(l1 == 0 || l2 == 0)
 	{
-		for(int j=0; j<l2+1; j++)
+		return 0;
+	}
+	
+	int tab[l2+1][l1+1];
+	memset(tab, 0, sizeof(tab));
+	
+	for(int i = 1; i <= l2; i++)
+	{
+		for(int j = 1; j <= l1; j++)
 		{
-			mem[i][j]="";
+			if(seqA[j-1] == seqB[i-1])
+			tab[i][j] = tab[i-1][j-1] + 1;
+			
+			else
+				tab[i][j] = max(tab[i-1][j], tab[i][j-1]);
 		}
 	}
 	
-	cout<<LCS(s1,s2,0,l1,0,l2,*mem,l2+1);
+	int i = l2, j = l1;
+	int output[tab[l2][l1]];
+	memset(output, 0, sizeof(output));
+	int k = 0;
+	while (true)
+	{
+		if (i==0 || j==0)
+			break;
+		if (tab[i][j] == tab[i][j-1])
+			j--;
+		else if (tab[i][j] == tab[i-1][j])
+			i--;
+		else
+		{
+			output[k] = seqB[i-1];
+			k++;
+			i--;
+			j--;
+		}
+	}
+	for (int i=0; i<tab[l2][l1]; i++)
+		cout << output[tab[l2][l1]-i-1] << " ";
 }
